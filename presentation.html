@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class='no-js'>
+  <head>
+    <title>Client Side MVC with Backbone.js</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-type' />
+    <script type='text/javascript'>
+      //<![CDATA[
+        (function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)
+      //]]>
+    </script>
+    <link href='stylesheets/shCoreMidnight.css' media='Screen,projection' rel='stylesheet' type='text/css' />
+    <link href='stylesheets/screen.css' media='Screen,projection' rel='stylesheet' type='text/css' />
+    <script src='lib/jquery/jquery-1.6.4.min.js' type='text/javascript'></script>
+    <script src='scripts/jquery.presentation.js' type='text/javascript'></script>
+    <script src='scripts/global.js' type='text/javascript'></script>
+    <script src='scripts/shCore.js' type='text/javascript'></script>
+    <script src='scripts/shBrushJScript.js' type='text/javascript'></script>
+    <script src='scripts/shBrushCoffee.js' type='text/javascript'></script>
+    <script src='lib/underscore/underscore-min.js' type='text/javascript'></script>
+    <script src='lib/modernizr/modernizr-1.6.min.js' type='text/javascript'></script>
+    <script src='lib/backbone/backbone-min.js' type='text/javascript'></script>
+    <script src='scripts/example-model.js' type='text/javascript'></script>
+    <script src='scripts/example-view.js' type='text/javascript'></script>
+    <script src='scripts/example-collection.js' type='text/javascript'></script>
+    <script id='timer-template' type='text/template'>
+      <%- name %> in <%- time %> <%- unit %>
+    </script>
+    <script id='new-timer-template' type='text/template'>
+      <form>
+        <input class=name type=text value='<%- name %>' />
+        <span class='method'>in</span>
+        <input class=time type=text value='<%- time %>' />
+        <input class=unit type=text value='<%- unit %>' />
+        <input class='submit' name='save-timer' type='button' value='create' />
+      </form>
+    </script>
+  </head>
+  <body>
+    <div id='header'>
+      <div class='container'>
+        <span class='title'>Client Side MVC with Backbone.js</span>
+      </div>
+    </div>
+    <div id='content'>
+      <div id='slides'>
+        <div class='slide'>
+          <h2>Introduction</h2>
+          <p>Backbone is a leight-weight and clean JS library (~1000 LOC) used by projects such as</p>
+          <figure>
+            <img src='images/examples/linkedin-mobile.png' />
+            <figcaption>LinkedIn Mobile</figcaption>
+          </figure>
+          <figure>
+            <img src='images/examples/groupon-now.png' />
+            <figcaption>Groupon Now!</figcaption>
+          </figure>
+          <figure>
+            <img src='images/examples/basecamp-mobile.png' />
+            <figcaption>Basecamp Mobile</figcaption>
+          </figure>
+          <figure>
+            <img src='images/examples/soundcloud-mobile.png' />
+            <figcaption>SoundCloud Mobile</figcaption>
+          </figure>
+          <figure>
+            <img src='images/examples/grove.io.png' />
+            <figcaption>Grove.io</figcaption>
+          </figure>
+          <figure>
+            <img src='images/examples/bittorrent.png' />
+            <figcaption>BitTorrent</figcaption>
+          </figure>
+        </div>
+        <div class='slide'>
+          <h2>Part I</h2>
+          <ol>
+            <li>Why Backbone.js?</li>
+            <li>What can Backbone do?</li>
+            <li>What can't Backbone do?</li>
+            <li>Analogies to Ruby on Rails</li>
+            <li>Models</li>
+            <li>Views</li>
+            <li>Routers</li>
+            <li>Collections</li>
+            <li>Backend & Collection persistency</li>
+          </ol>
+        </div>
+        <div class='slide'>
+          <h2>1. Why Backbone.js?</h2>
+          <p>Implementing non-trivial JS logic tends to be</p>
+          <ul>
+            <li>difficult to manage, at a certain point</li>
+            <li>ugly, fast (jQuery-chains, typeless classes)</li>
+            <li>DOM-oriented (low abstraction)</li>
+            <li>lacking DRYness</li>
+            <li>storing data in the DOM</li>
+          </ul>
+        </div>
+        <div class='slide'>
+          <h2>2. What can Backbone do?</h2>
+          <p>Allows to structure your JS code MVC style:</p>
+          <pre class='brush: coffee'>class App.Views.Post extends Backbone.View&#x000A;class App.Model.Post extends Backbone.Model&#x000A;class App.Collections.Posts extends Backbone.Collection&#x000A;class App.Routers.PostsRouters extends Backbone.Router</pre>
+          <p>Yields semantically meaningful JS classes.</p>
+          <p>Offers powerful event bindings.</p>
+        </div>
+        <div class='slide'>
+          <h2>3. What can't Backbone do?</h2>
+          <p>Not self-contained, requires jQuery and Underscore.</p>
+          <p>No native templating except Underscore.</p>
+          <p>No native local storage implementation.</p>
+        </div>
+        <div class='slide'>
+          <h2>4. Analogies to Ruby on Rails</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Backbone.js</th>
+                <th>Ruby on Rails</th>
+              </tr>
+            </thead>
+            <tr>
+              <td>Backbone.Model</td>
+              <td>ActiveModel</td>
+            </tr>
+            <tr>
+              <td>Backbone.View</td>
+              <td>ActionView</td>
+            </tr>
+            <tr>
+              <td>Backbone.Router</td>
+              <td>ActionController / ActionDispatch</td>
+            </tr>
+            <tr>
+              <td>Backbone.Collection</td>
+              <td>ActiveRecord</td>
+            </tr>
+          </table>
+        </div>
+        <div class='slide'>
+          <h2>5. Models</h2>
+          <p>Core of any Backbone.js application, handles its properties and logic. Can provide validations, access control and conversions.</p>
+          <p>It's sufficient to extend Backbone's Model class:</p>
+          <pre class='brush: coffee'>class window.App.Models.Timer extends Backbone.Model&#x000A;</pre>
+          <p>You can implement additional behaviour, if required:</p>
+          <pre class='brush: coffee'> class window.Timer extends Backbone.Model&#x000A;&#x000A;   initialize: ->&#x000A;     @reminders = new Backbone.Collection()&#x000A;&#x000A;   defaults:&#x000A;     unit: 's'&#x000A;&#x000A;   validate: (attr) ->&#x000A;     if ((new Date() - attr.end) > 0)&#x000A;       return "Timer can't be in the past"</pre>
+          <pre class='brush: js'>var m = new window.Timer({ name: 'foo'});</pre>
+        </div>
+        <div class='slide'>
+          <h2>6. Views</h2>
+          <p>Views represent the DOM side of the application and handle rendering of model data.</p>
+          <pre class='brush: coffee'>class window.TimerView extends Backbone.View&#x000A;&#x000A;  tagName: 'li'&#x000A;&#x000A;  initialize: ->&#x000A;    _.bindAll this, 'render'&#x000A;    @template = _.template $('#timer-template').html()&#x000A;    @model.bind 'change', @render&#x000A;&#x000A;  render: ->&#x000A;    $(@el).html @template(@model.toJSON())</pre>
+          <ul class='place-holder'>
+            <li>This is a list item of a list with the class 'place-holder'.</li>
+          </ul>
+          <pre class='brush: js'>var timer = new window.Timer({ name: 'foo', time: '60'});&#x000A;var v = new window.TimerView({ model: timer, el: '.place-holder'});&#x000A;v.render();&#x000A;timer.set({name: 'bar', time: '2', unit: 'h'});</pre>
+        </div>
+        <div class='slide'>
+          <h2>7. Routers</h2>
+          <p>Routers handle URL history and matching.</p>
+          <pre class='brush: coffee'>class window.Routes extends Backbone.Router&#x000A;&#x000A;  routes:&#x000A;    '': 'home',&#x000A;    'search/:query': 'search',&#x000A;    'search/:query/p:page': 'search'&#x000A;&#x000A;  home: ->&#x000A;    @view = new window.TimerView&#x000A;    @view.render()&#x000A;&#x000A;  search: (query, page) ->&#x000A;    'foo'</pre>
+          <pre class='brush: coffee'>try&#x000A;  0 / undefined&#x000A;catch error&#x000A;  window.router.navigate('error-notification', true)</pre>
+        </div>
+        <div class='slide'>
+          <h2>8. Collections</h2>
+          <p>A collection contains a set of model instances and exposes events to react upon adding or removing items. Underscore provides convenience methods such as forEach(each), find(), add(), get(), remove() and filter(select).</p>
+          <pre class='brush: coffee'>class window.Timers extends Backbone.Collection&#x000A;&#x000A;  model: window.Timer</pre>
+          An example to bind collection events to a view:
+          <pre class='brush: js'>var m = new window.Timer({ name: 'foo', time: '60'});&#x000A;var new_timer_view = new window.NewTimer({ model: m});&#x000A;new_timer_view.render();&#x000A;window.timers = new window.Timers();&#x000A;var cv = new window.TimersView({ collection: window.timers });&#x000A;cv.render();</pre>
+          <div class='new-timer'></div>
+          <ul class='timers'></ul>
+        </div>
+        <div class='slide'>
+          <h2>9. Backend & Collection persistency</h2>
+          <p>Backbone offers a RESTful JSON interface connecting to an arbitrary backend (using jQuery). Allows to override the default implementation (Backbone.sync), e.g. in order to use local storage.</p>
+          Models:
+          <ul>
+            <li>fetch(): Resets the model's state from the server.</li>
+            <li>save(): Saves the model if it's valid.</li>
+            <li>destroy()</li>
+            <li>isNew(), hasChanged()</li>
+          </ul>
+          Collections:
+          <ul>
+            <li>fetch(): Replaces the collection with a default set.</li>
+            <li>create(attr): Creates and adds a model to the collection.</li>
+          </ul>
+        </div>
+        <div class='slide'>
+          <h2>Part II</h2>
+          <ol>
+            <li>BDD with Jasmine</li>
+            <li>Sinon spies and stubs</li>
+            <li>Model specs</li>
+            <li>View specs</li>
+            <li>Router specs</li>
+            <li>Collection specs</li>
+          </ol>
+        </div>
+        <div class='slide'>
+          <h2>1. BDD with Jasmine</h2>
+          <p>Offers rspec like sytnax:</p>
+          <pre class='brush: coffee'>describe 'when instantiated without a paramter', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @timer = new window.timer&#x000A;&#x000A;    it 'should not have a default name', ->&#x000A;      expect(@timer.get('name')).toBeUndefined&#x000A;</pre>
+          <p>It's fast, due to the shallow framework stack.</p>
+        </div>
+        <div class='slide'>
+          <h2>2. Sinon spies and stubs</h2>
+          <p>A spy records what's going on with a function after it's been called.</p>
+          <pre class='brush: coffee'>it 'should call a certain function', ->&#x000A;  @spy = sinon.spy()&#x000A;  @class.bind 'certain_function', @spy&#x000A;  @class.someOtherFunctionCall&#x000A;  expect(@spy).toHaveBeenCalledOnce&#x000A;  expect(@spy).toHaveBeenCalledWith 'bar'</pre>
+          <p>Stubs replace existing functions with pre-programmed behavior in order to avoid calling functionality that's tested elsewhere.</p>
+          <pre class='brush: coffee'>beforeEach ->&#x000A;  @view = window.TimerView&#x000A;  @viewStub =&#x000A;    sinon.stub(window, 'TimerView').returns(new Backbone.View)&#x000A;  @view.render()&#x000A;&#x000A;afterEach ->&#x000A;  @viewStub.restore()&#x000A;&#x000A;it 'should do something not related to render()', ->&#x000A;  expect($(@view.el).html()).toContain('some content')</pre>
+        </div>
+        <div class='slide'>
+          <h2>3. Model specs</h2>
+          <p>This example demonstrates the use of sinon spies to watch for validation errors.</p>
+          <pre class='brush: coffee'>describe 'Timer model', ->&#x000A;&#x000A;  describe 'when instantiated with a paramter', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @timer = new window.Timer&#x000A;        name: 'foo'&#x000A;        time: 10&#x000A;&#x000A;    it 'should exhibit attributes', ->&#x000A;      expect(@timer.get('name')).toEqual 'foo'&#x000A;&#x000A;    it 'should set the unit to seconds by default', ->&#x000A;      expect(@timer.get('unit')).toEqual 's'&#x000A;&#x000A;    describe 'validation', ->&#x000A;&#x000A;      it 'should not save with invalid end time', ->&#x000A;        @eventSpy = sinon.spy()&#x000A;        @timer.bind 'error', @eventSpy&#x000A;        date = new Date()&#x000A;        date.setDate(date.getDate() - 1)&#x000A;        @timer.save&#x000A;          end: date&#x000A;        expect(@eventSpy).toHaveBeenCalledOnce()&#x000A;        expect(@eventSpy).toHaveBeenCalledWith(&#x000A;          @timer&#x000A;          "Timer can't be in the past"&#x000A;        )&#x000A;&#x000A;  describe 'when instantiated without a paramter', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @timer = new window.Timer&#x000A;&#x000A;    it 'should not have a default name', ->&#x000A;      expect(@timer.get('name')).toBeUndefined</pre>
+        </div>
+        <div class='slide'>
+          <h2>4. View specs</h2>
+          <p>Example</p>
+          <pre class='brush: coffee'>describe 'TimerView', ->&#x000A;&#x000A;  beforeEach ->&#x000A;    timer = new window.Timer&#x000A;      name: 'foo'&#x000A;      time: '60'&#x000A;    this.view = new window.TimerView&#x000A;      model: timer&#x000A;&#x000A;  afterEach ->&#x000A;&#x000A;  describe 'Instantiation', ->&#x000A;&#x000A;    it 'should create li element', ->&#x000A;      expect($(@view.el)).toBe 'li'&#x000A;&#x000A;  describe 'Rendering', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @view.render()&#x000A;&#x000A;    it 'should add the element to the DOM', ->&#x000A;      expect($(@view.el).html()).toContain 'foo'</pre>
+        </div>
+        <div class='slide'>
+          <h2>5. Router specs</h2>
+          <p>This example clearly demonstrates the use advantage of stubs</p>
+          <pre class='brush: coffee'>describe 'Routes', ->&#x000A;&#x000A;  beforeEach ->&#x000A;    @router = new window.Routes&#x000A;    @routeSpy = sinon.spy()&#x000A;    try&#x000A;      Backbone.history.start&#x000A;        silent: true,&#x000A;        pushState:true&#x000A;    catch e&#x000A;    @router.navigate 'elsewhere'&#x000A;&#x000A;  it 'fires the home route with a blank hash', ->&#x000A;    @timerView = new Backbone.View&#x000A;    @timerView.render = sinon.stub()&#x000A;    @timerViewStub = sinon.stub(window, 'TimerView').returns(@timerView)&#x000A;&#x000A;    @router.bind 'route:home', @routeSpy&#x000A;    @router.navigate '', true&#x000A;    expect(@routeSpy).toHaveBeenCalledOnce()&#x000A;    expect(@routeSpy).toHaveBeenCalledWith()&#x000A;&#x000A;    @timerViewStub.restore()&#x000A;&#x000A;&#x000A;describe 'Routing', ->&#x000A;&#x000A;  beforeEach ->&#x000A;    @router = new window.Routes&#x000A;&#x000A;  describe 'home handler', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @custom_view = new Backbone.View()&#x000A;      @custom_view.render = sinon.stub()&#x000A;      @view =&#x000A;        sinon.stub(window, 'TimerView').returns(@custom_view)&#x000A;      @router.home()&#x000A;&#x000A;    afterEach ->&#x000A;      @view.restore()&#x000A;&#x000A;    it 'creates a TimerView view', ->&#x000A;      expect(@view).toHaveBeenCalledOnce()&#x000A;      expect(@view).toHaveBeenCalledWith()&#x000A;&#x000A;    it 'calls the render method of TimerView', ->&#x000A;      expect(@custom_view.render).toHaveBeenCalledOnce()&#x000A;      expect(@custom_view.render).toHaveBeenCalledWith()</pre>
+        </div>
+        <div class='slide'>
+          <h2>6. Collection specs</h2>
+          <p>Example</p>
+          <pre class='brush: coffee'>describe 'Timers collection', ->&#x000A;&#x000A;  beforeEach ->&#x000A;&#x000A;    @timer1 = new Backbone.Model&#x000A;      id: 1&#x000A;      name: 'foo'&#x000A;    @timer2 = new Backbone.Model&#x000A;      id: 2&#x000A;      name: 'bar'&#x000A;&#x000A;    @timers = new window.Timers&#x000A;    @timerStub = sinon.stub window, 'Timer'&#x000A;&#x000A;  afterEach ->&#x000A;    @timerStub.restore()&#x000A;&#x000A;  describe 'When instantiated with model literal', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @model = new Backbone.Model&#x000A;        id: 3&#x000A;        name: 'foobar'&#x000A;      @timerStub.returns @model&#x000A;      @timers.model = window.Timer&#x000A;      @timers.add&#x000A;        id: 3&#x000A;        name: 'foobar'&#x000A;&#x000A;    it 'should have one Timer model', ->&#x000A;      expect(@timers.length).toEqual 1&#x000A;      expect(@timerStub).toHaveBeenCalled()&#x000A;&#x000A;    it 'should find a model by id', ->&#x000A;      expect(@timers.get(3).get('id')).toEqual @model.get('id')&#x000A;&#x000A;    it 'should find a model by index', ->&#x000A;      expect(@timers.at(0).get('id')).toEqual @model.get('id')&#x000A;&#x000A;    it 'should have called the Timer constructor', ->&#x000A;      expect(@timerStub).toHaveBeenCalledOnce()&#x000A;      expect(@timerStub).toHaveBeenCalledWith&#x000A;        id:3&#x000A;        name: 'foobar'&#x000A;&#x000A;  describe 'When adding models', ->&#x000A;&#x000A;    it 'should order models by id by default', ->&#x000A;      @timers.model = window.Timer&#x000A;      @timers.add([@timer1, @timer2])&#x000A;      expect(@timers.at(0)).toBe @timer1&#x000A;      expect(@timers.at(1)).toBe @timer2</pre>
+        </div>
+        <div class='slide'>
+          <h2>That's it!</h2>
+        </div>
+      </div>
+    </div>
+    <div id='footer'>
+      <div class='container'>
+        <div class='legal'>
+          &copy; 2011 Falko Schmidt, Panter llc
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

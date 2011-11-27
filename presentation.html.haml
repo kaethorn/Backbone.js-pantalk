@@ -1,0 +1,458 @@
+!!! 5
+
+%html.no-js
+  %head
+    %title Client Side MVC with Backbone.js
+    %meta{:content => "text/html; charset=utf-8", "http-equiv" => "Content-type"}
+    :javascript
+      (function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)
+    %link{:href => "stylesheets/shCoreMidnight.css", :media => "Screen,projection", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "stylesheets/screen.css", :media => "Screen,projection", :rel => "stylesheet", :type => "text/css"}
+    %script{:src => "lib/jquery/jquery-1.6.4.min.js", :type => "text/javascript"}
+    %script{:src => "scripts/jquery.presentation.js", :type => "text/javascript"}
+    %script{:src => "scripts/global.js", :type => "text/javascript"}
+    %script{:src => "scripts/shCore.js", :type => "text/javascript"}
+    %script{:src => "scripts/shBrushJScript.js", :type => "text/javascript"}
+    %script{:src => "scripts/shBrushCoffee.js", :type => "text/javascript"}
+    %script{:src => "lib/underscore/underscore-min.js", :type => "text/javascript"}
+    %script{:src => "lib/modernizr/modernizr-1.6.min.js", :type => "text/javascript"}
+    %script{:src => "lib/backbone/backbone-min.js", :type => "text/javascript"}
+    %script{:src => "scripts/example-model.js", :type => "text/javascript"}
+    %script{:src => "scripts/example-view.js", :type => "text/javascript"}
+    %script{:src => "scripts/example-collection.js", :type => "text/javascript"}
+
+    %script{:type => 'text/template', :id => 'timer-template'}
+      <%- name %> in <%- time %> <%- unit %>
+    %script{:type => 'text/template', :id => 'new-timer-template'}
+      %form
+        <input class=name type=text value='<%- name %>' />
+        %span.method in
+        <input class=time type=text value='<%- time %>' />
+        <input class=unit type=text value='<%- unit %>' />
+        %input.submit{:type => 'button', :value => 'create', :name => 'save-timer'}
+
+  %body
+    #header
+      .container
+        %span.title Client Side MVC with Backbone.js
+    #content
+      #slides
+        .slide
+          %h2 Introduction
+          %p Backbone is a leight-weight and clean JS library (~1000 LOC) used by projects such as
+          %figure
+            %img{ :src => 'images/examples/linkedin-mobile.png' }
+            %figcaption LinkedIn Mobile
+          %figure
+            %img{ :src => 'images/examples/groupon-now.png' }
+            %figcaption Groupon Now!
+          %figure
+            %img{ :src => 'images/examples/basecamp-mobile.png' }
+            %figcaption Basecamp Mobile
+          %figure
+            %img{ :src => 'images/examples/soundcloud-mobile.png' }
+            %figcaption SoundCloud Mobile
+          %figure
+            %img{ :src => 'images/examples/grove.io.png' }
+            %figcaption Grove.io
+          %figure
+            %img{ :src => 'images/examples/bittorrent.png' }
+            %figcaption BitTorrent
+        .slide
+          %h2 Part I
+          %ol
+            %li Why Backbone.js?
+            %li What can Backbone do?
+            %li What can't Backbone do?
+            %li Analogies to Ruby on Rails
+            %li Models
+            %li Views
+            %li Routers
+            %li Collections
+            %li Backend & Collection persistency
+        .slide
+          %h2 1. Why Backbone.js?
+          %p Implementing non-trivial JS logic tends to be
+          %ul
+            %li difficult to manage, at a certain point
+            %li ugly, fast (jQuery-chains, typeless classes)
+            %li DOM-oriented (low abstraction)
+            %li lacking DRYness
+            %li storing data in the DOM
+        .slide
+          %h2 2. What can Backbone do?
+          %p Allows to structure your JS code MVC style:
+          %pre.brush:.coffee
+            :preserve
+              class App.Views.Post extends Backbone.View
+              class App.Model.Post extends Backbone.Model
+              class App.Collections.Posts extends Backbone.Collection
+              class App.Routers.PostsRouters extends Backbone.Router
+          %p Yields semantically meaningful JS classes.
+          %p Offers powerful event bindings.
+        .slide
+          %h2 3. What can't Backbone do?
+          %p Not self-contained, requires jQuery and Underscore.
+          %p No native templating except Underscore.
+          %p No native local storage implementation.
+        .slide
+          %h2 4. Analogies to Ruby on Rails
+          %table
+            %thead
+              %tr
+                %th Backbone.js
+                %th Ruby on Rails
+            %tr
+              %td Backbone.Model
+              %td ActiveModel
+            %tr
+              %td Backbone.View
+              %td ActionView
+            %tr
+              %td Backbone.Router
+              %td ActionController / ActionDispatch
+            %tr
+              %td Backbone.Collection
+              %td ActiveRecord
+
+        .slide
+          %h2 5. Models
+          %p Core of any Backbone.js application, handles its properties and logic. Can provide validations, access control and conversions.
+          %p It's sufficient to extend Backbone's Model class:
+          %pre.brush:.coffee
+            :preserve
+              class window.App.Models.Timer extends Backbone.Model
+
+          %p You can implement additional behaviour, if required:
+          %pre.brush:.coffee
+            :preserve
+               class window.Timer extends Backbone.Model
+
+                 initialize: ->
+                   @reminders = new Backbone.Collection()
+
+                 defaults:
+                   unit: 's'
+
+                 validate: (attr) ->
+                   if ((new Date() - attr.end) > 0)
+                     return "Timer can't be in the past"
+          %pre.brush:.js
+            :preserve
+              var m = new window.Timer({ name: 'foo'});
+        .slide
+          %h2 6. Views
+          %p Views represent the DOM side of the application and handle rendering of model data.
+          %pre.brush:.coffee
+            :preserve
+              class window.TimerView extends Backbone.View
+
+                tagName: 'li'
+
+                initialize: ->
+                  _.bindAll this, 'render'
+                  @template = _.template $('#timer-template').html()
+                  @model.bind 'change', @render
+
+                render: ->
+                  $(@el).html @template(@model.toJSON())
+          %ul.place-holder
+            %li This is a list item of a list with the class 'place-holder'.
+          %pre.brush:.js
+            :preserve
+              var timer = new window.Timer({ name: 'foo', time: '60'});
+              var v = new window.TimerView({ model: timer, el: '.place-holder'});
+              v.render();
+              timer.set({name: 'bar', time: '2', unit: 'h'});
+        .slide
+          %h2 7. Routers
+          %p Routers handle URL history and matching.
+          %pre.brush:.coffee
+            :preserve
+              class window.Routes extends Backbone.Router
+
+                routes:
+                  '': 'home',
+                  'search/:query': 'search',
+                  'search/:query/p:page': 'search'
+
+                home: ->
+                  @view = new window.TimerView
+                  @view.render()
+
+                search: (query, page) ->
+                  'foo'
+          %pre.brush:.coffee
+            :preserve
+              try
+                0 / undefined
+              catch error
+                window.router.navigate('error-notification', true)
+        .slide
+          %h2 8. Collections
+          %p A collection contains a set of model instances and exposes events to react upon adding or removing items. Underscore provides convenience methods such as forEach(each), find(), add(), get(), remove() and filter(select).
+          %pre.brush:.coffee
+            :preserve
+              class window.Timers extends Backbone.Collection
+
+                model: window.Timer
+          An example to bind collection events to a view:
+          %pre.brush:.js
+            :preserve
+              var m = new window.Timer({ name: 'foo', time: '60'});
+              var new_timer_view = new window.NewTimer({ model: m});
+              new_timer_view.render();
+              window.timers = new window.Timers();
+              var cv = new window.TimersView({ collection: window.timers });
+              cv.render();
+          .new-timer
+          %ul.timers
+        .slide
+          %h2 9. Backend & Collection persistency
+          %p Backbone offers a RESTful JSON interface connecting to an arbitrary backend (using jQuery). Allows to override the default implementation (Backbone.sync), e.g. in order to use local storage.
+          Models:
+          %ul
+            %li fetch(): Resets the model's state from the server.
+            %li save(): Saves the model if it's valid.
+            %li destroy()
+            %li isNew(), hasChanged()
+          Collections:
+          %ul
+            %li fetch(): Replaces the collection with a default set.
+            %li create(attr): Creates and adds a model to the collection.
+
+        .slide
+          %h2 Part II
+          %ol
+            %li BDD with Jasmine
+            %li Sinon spies and stubs
+            %li Model specs
+            %li View specs
+            %li Router specs
+            %li Collection specs
+        .slide
+          %h2 1. BDD with Jasmine
+          %p Offers rspec like sytnax:
+          %pre.brush:.coffee
+            :preserve
+              describe 'when instantiated without a paramter', ->
+
+                  beforeEach ->
+                    @timer = new window.timer
+
+                  it 'should not have a default name', ->
+                    expect(@timer.get('name')).toBeUndefined
+
+          %p It's fast, due to the shallow framework stack.
+        .slide
+          %h2 2. Sinon spies and stubs
+          %p A spy records what's going on with a function after it's been called.
+          %pre.brush:.coffee
+            :preserve
+              it 'should call a certain function', ->
+                @spy = sinon.spy()
+                @class.bind 'certain_function', @spy
+                @class.someOtherFunctionCall
+                expect(@spy).toHaveBeenCalledOnce
+                expect(@spy).toHaveBeenCalledWith 'bar'
+          %p Stubs replace existing functions with pre-programmed behavior in order to avoid calling functionality that's tested elsewhere.
+          %pre.brush:.coffee
+            :preserve
+              beforeEach ->
+                @view = window.TimerView
+                @viewStub =
+                  sinon.stub(window, 'TimerView').returns(new Backbone.View)
+                @view.render()
+
+              afterEach ->
+                @viewStub.restore()
+
+              it 'should do something not related to render()', ->
+                expect($(@view.el).html()).toContain('some content')
+        .slide
+          %h2 3. Model specs
+          %p This example demonstrates the use of sinon spies to watch for validation errors.
+          %pre.brush:.coffee
+            :preserve
+              describe 'Timer model', ->
+
+                describe 'when instantiated with a paramter', ->
+
+                  beforeEach ->
+                    @timer = new window.Timer
+                      name: 'foo'
+                      time: 10
+
+                  it 'should exhibit attributes', ->
+                    expect(@timer.get('name')).toEqual 'foo'
+
+                  it 'should set the unit to seconds by default', ->
+                    expect(@timer.get('unit')).toEqual 's'
+
+                  describe 'validation', ->
+
+                    it 'should not save with invalid end time', ->
+                      @eventSpy = sinon.spy()
+                      @timer.bind 'error', @eventSpy
+                      date = new Date()
+                      date.setDate(date.getDate() - 1)
+                      @timer.save
+                        end: date
+                      expect(@eventSpy).toHaveBeenCalledOnce()
+                      expect(@eventSpy).toHaveBeenCalledWith(
+                        @timer
+                        "Timer can't be in the past"
+                      )
+
+                describe 'when instantiated without a paramter', ->
+
+                  beforeEach ->
+                    @timer = new window.Timer
+
+                  it 'should not have a default name', ->
+                    expect(@timer.get('name')).toBeUndefined
+        .slide
+          %h2 4. View specs
+          %p Example
+          %pre.brush:.coffee
+            :preserve
+              describe 'TimerView', ->
+
+                beforeEach ->
+                  timer = new window.Timer
+                    name: 'foo'
+                    time: '60'
+                  this.view = new window.TimerView
+                    model: timer
+
+                afterEach ->
+
+                describe 'Instantiation', ->
+
+                  it 'should create li element', ->
+                    expect($(@view.el)).toBe 'li'
+
+                describe 'Rendering', ->
+
+                  beforeEach ->
+                    @view.render()
+
+                  it 'should add the element to the DOM', ->
+                    expect($(@view.el).html()).toContain 'foo'
+        .slide
+          %h2 5. Router specs
+          %p This example clearly demonstrates the use advantage of stubs
+          %pre.brush:.coffee
+            :preserve
+              describe 'Routes', ->
+
+                beforeEach ->
+                  @router = new window.Routes
+                  @routeSpy = sinon.spy()
+                  try
+                    Backbone.history.start
+                      silent: true,
+                      pushState:true
+                  catch e
+                  @router.navigate 'elsewhere'
+
+                it 'fires the home route with a blank hash', ->
+                  @timerView = new Backbone.View
+                  @timerView.render = sinon.stub()
+                  @timerViewStub = sinon.stub(window, 'TimerView').returns(@timerView)
+
+                  @router.bind 'route:home', @routeSpy
+                  @router.navigate '', true
+                  expect(@routeSpy).toHaveBeenCalledOnce()
+                  expect(@routeSpy).toHaveBeenCalledWith()
+
+                  @timerViewStub.restore()
+
+
+              describe 'Routing', ->
+
+                beforeEach ->
+                  @router = new window.Routes
+
+                describe 'home handler', ->
+
+                  beforeEach ->
+                    @custom_view = new Backbone.View()
+                    @custom_view.render = sinon.stub()
+                    @view =
+                      sinon.stub(window, 'TimerView').returns(@custom_view)
+                    @router.home()
+
+                  afterEach ->
+                    @view.restore()
+
+                  it 'creates a TimerView view', ->
+                    expect(@view).toHaveBeenCalledOnce()
+                    expect(@view).toHaveBeenCalledWith()
+
+                  it 'calls the render method of TimerView', ->
+                    expect(@custom_view.render).toHaveBeenCalledOnce()
+                    expect(@custom_view.render).toHaveBeenCalledWith()
+        .slide
+          %h2 6. Collection specs
+          %p Example
+          %pre.brush:.coffee
+            :preserve
+              describe 'Timers collection', ->
+
+                beforeEach ->
+
+                  @timer1 = new Backbone.Model
+                    id: 1
+                    name: 'foo'
+                  @timer2 = new Backbone.Model
+                    id: 2
+                    name: 'bar'
+
+                  @timers = new window.Timers
+                  @timerStub = sinon.stub window, 'Timer'
+
+                afterEach ->
+                  @timerStub.restore()
+
+                describe 'When instantiated with model literal', ->
+
+                  beforeEach ->
+                    @model = new Backbone.Model
+                      id: 3
+                      name: 'foobar'
+                    @timerStub.returns @model
+                    @timers.model = window.Timer
+                    @timers.add
+                      id: 3
+                      name: 'foobar'
+
+                  it 'should have one Timer model', ->
+                    expect(@timers.length).toEqual 1
+                    expect(@timerStub).toHaveBeenCalled()
+
+                  it 'should find a model by id', ->
+                    expect(@timers.get(3).get('id')).toEqual @model.get('id')
+
+                  it 'should find a model by index', ->
+                    expect(@timers.at(0).get('id')).toEqual @model.get('id')
+
+                  it 'should have called the Timer constructor', ->
+                    expect(@timerStub).toHaveBeenCalledOnce()
+                    expect(@timerStub).toHaveBeenCalledWith
+                      id:3
+                      name: 'foobar'
+
+                describe 'When adding models', ->
+
+                  it 'should order models by id by default', ->
+                    @timers.model = window.Timer
+                    @timers.add([@timer1, @timer2])
+                    expect(@timers.at(0)).toBe @timer1
+                    expect(@timers.at(1)).toBe @timer2
+        .slide
+          %h2 That's it!
+    #footer
+      .container
+        .legal
+          \&copy; 2011 Falko Schmidt, Panter llc
