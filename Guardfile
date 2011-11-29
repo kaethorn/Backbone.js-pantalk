@@ -9,6 +9,6 @@ guard 'shell' do
   end
   watch(%r{^(.+)\.coffee$}) do |m|
     puts "Compiling coffee script"
-    `coffee -c #{m[1].coffee`
+    `coffee -c #{m[1]}.coffee`
   end
 end

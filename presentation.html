@@ -90,7 +90,7 @@
           <p>Implementing non-trivial JS logic tends to be</p>
           <ul>
             <li>difficult to manage, at a certain point</li>
-            <li>ugly, fast (jQuery-chains, typeless classes)</li>
+            <li>ugly (jQuery-chains, typeless classes)</li>
             <li>DOM-oriented (low abstraction)</li>
             <li>lacking DRYness</li>
             <li>storing data in the DOM</li>
@@ -221,7 +221,7 @@
         </div>
         <div class='slide'>
           <h2>5. Router specs</h2>
-          <p>This example clearly demonstrates the use advantage of stubs</p>
+          <p>This example clearly demonstrates the advantage of using stubs.</p>
           <pre class='brush: coffee'>describe 'Routes', ->&#x000A;&#x000A;  beforeEach ->&#x000A;    @router = new window.Routes&#x000A;    @routeSpy = sinon.spy()&#x000A;    try&#x000A;      Backbone.history.start&#x000A;        silent: true,&#x000A;        pushState:true&#x000A;    catch e&#x000A;    @router.navigate 'elsewhere'&#x000A;&#x000A;  it 'fires the home route with a blank hash', ->&#x000A;    @timerView = new Backbone.View&#x000A;    @timerView.render = sinon.stub()&#x000A;    @timerViewStub = sinon.stub(window, 'TimerView').returns(@timerView)&#x000A;&#x000A;    @router.bind 'route:home', @routeSpy&#x000A;    @router.navigate '', true&#x000A;    expect(@routeSpy).toHaveBeenCalledOnce()&#x000A;    expect(@routeSpy).toHaveBeenCalledWith()&#x000A;&#x000A;    @timerViewStub.restore()&#x000A;&#x000A;&#x000A;describe 'Routing', ->&#x000A;&#x000A;  beforeEach ->&#x000A;    @router = new window.Routes&#x000A;&#x000A;  describe 'home handler', ->&#x000A;&#x000A;    beforeEach ->&#x000A;      @custom_view = new Backbone.View()&#x000A;      @custom_view.render = sinon.stub()&#x000A;      @view =&#x000A;        sinon.stub(window, 'TimerView').returns(@custom_view)&#x000A;      @router.home()&#x000A;&#x000A;    afterEach ->&#x000A;      @view.restore()&#x000A;&#x000A;    it 'creates a TimerView view', ->&#x000A;      expect(@view).toHaveBeenCalledOnce()&#x000A;      expect(@view).toHaveBeenCalledWith()&#x000A;&#x000A;    it 'calls the render method of TimerView', ->&#x000A;      expect(@custom_view.render).toHaveBeenCalledOnce()&#x000A;      expect(@custom_view.render).toHaveBeenCalledWith()</pre>
         </div>
         <div class='slide'>

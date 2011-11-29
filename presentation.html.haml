@@ -75,7 +75,7 @@
           %p Implementing non-trivial JS logic tends to be
           %ul
             %li difficult to manage, at a certain point
-            %li ugly, fast (jQuery-chains, typeless classes)
+            %li ugly (jQuery-chains, typeless classes)
             %li DOM-oriented (low abstraction)
             %li lacking DRYness
             %li storing data in the DOM
@@ -341,7 +341,7 @@
                     expect($(@view.el).html()).toContain 'foo'
         .slide
           %h2 5. Router specs
-          %p This example clearly demonstrates the use advantage of stubs
+          %p This example clearly demonstrates the advantage of using stubs.
           %pre.brush:.coffee
             :preserve
               describe 'Routes', ->
