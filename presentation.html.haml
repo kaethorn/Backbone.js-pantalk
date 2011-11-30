@@ -17,6 +17,7 @@
     %script{:src => "lib/underscore/underscore-min.js", :type => "text/javascript"}
     %script{:src => "lib/modernizr/modernizr-1.6.min.js", :type => "text/javascript"}
     %script{:src => "lib/backbone/backbone-min.js", :type => "text/javascript"}
+    %script{:src => "scripts/backbone.localStorage.js", :type => "text/javascript"}
     %script{:src => "scripts/example-model.js", :type => "text/javascript"}
     %script{:src => "scripts/example-view.js", :type => "text/javascript"}
     %script{:src => "scripts/example-collection.js", :type => "text/javascript"}
@@ -252,8 +253,8 @@
               it 'should call a certain function', ->
                 @spy = sinon.spy()
                 @class.bind 'certain_function', @spy
-                @class.someOtherFunctionCall
-                expect(@spy).toHaveBeenCalledOnce
+                @class.someOtherFunctionCall()
+                expect(@spy).toHaveBeenCalledOnce()
                 expect(@spy).toHaveBeenCalledWith 'bar'
           %p Stubs replace existing functions with pre-programmed behavior in order to avoid calling functionality that's tested elsewhere.
           %pre.brush:.coffee
@@ -299,10 +300,9 @@
                       @timer.save
                         end: date
                       expect(@eventSpy).toHaveBeenCalledOnce()
-                      expect(@eventSpy).toHaveBeenCalledWith(
+                      expect(@eventSpy).toHaveBeenCalledWith
                         @timer
                         "Timer can't be in the past"
-                      )
 
                 describe 'when instantiated without a paramter', ->
 
@@ -310,7 +310,7 @@
                     @timer = new window.Timer
 
                   it 'should not have a default name', ->
-                    expect(@timer.get('name')).toBeUndefined
+                    expect(@timer.get('name')).toBeUndefined()
         .slide
           %h2 4. View specs
           %p Example

@@ -33,7 +33,7 @@
         return this.timer = new window.Timer;
       });
       return it('should not have a default name', function() {
-        return expect(this.timer.get('name')).toBeUndefined;
+        return expect(this.timer.get('name')).toBeUndefined();
       });
     });
   });

@@ -34,5 +34,4 @@ describe 'Timer model', ->
       @timer = new window.Timer
 
     it 'should not have a default name', ->
-      expect(@timer.get('name')).toBeUndefined
-
+      expect(@timer.get('name')).toBeUndefined()

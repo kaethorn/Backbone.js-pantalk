@@ -4,14 +4,17 @@
       this.router = new window.Routes;
       this.routeSpy = sinon.spy();
       try {
-        Backbone.history.start({
+        Backbone.history.start()({
           silent: true,
           pushState: true
         });
       } catch (e) {
 
       }
-      return this.router.navigate('elsewhere');
+      return this.router.navigate('elsewhere', false);
+    });
+    afterEach(function() {
+      return this.router.navigate('');
     });
     it('fires the home route with a blank hash', function() {
       this.timerView = new Backbone.View;
@@ -43,7 +46,8 @@
         return this.router.home();
       });
       afterEach(function() {
-        return this.view.restore();
+        this.view.restore();
+        return this.router.navigate('', false);
       });
       it('creates a TimerView view', function() {
         expect(this.view).toHaveBeenCalledOnce();

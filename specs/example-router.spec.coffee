@@ -4,11 +4,14 @@ describe 'Routes', ->
     @router = new window.Routes
     @routeSpy = sinon.spy()
     try
-      Backbone.history.start
+      Backbone.history.start()
         silent: true,
         pushState:true
     catch e
-    @router.navigate 'elsewhere'
+    @router.navigate 'elsewhere', false
+
+  afterEach ->
+    @router.navigate ''
 
   it 'fires the home route with a blank hash', ->
     @timerView = new Backbone.View
@@ -45,6 +48,7 @@ describe 'Routing', ->
 
     afterEach ->
       @view.restore()
+      @router.navigate '', false
 
     it 'creates a TimerView view', ->
       expect(@view).toHaveBeenCalledOnce()
